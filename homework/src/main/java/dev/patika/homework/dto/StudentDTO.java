@@ -8,6 +8,8 @@ import lombok.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -34,5 +36,8 @@ public class StudentDTO {
     @ApiModelProperty(example = "MALE")
     @NotBlank(message = "Gender is mandatory!")
     private Gender gender;
+
+    private Instant createTime;
+    private Instant modifiedTime;
 
 }
