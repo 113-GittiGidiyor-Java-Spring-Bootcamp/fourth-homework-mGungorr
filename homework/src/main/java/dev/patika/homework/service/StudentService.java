@@ -16,7 +16,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * This service has operations on api, you can do CRUD operations for Students and exceptions controls
+ */
 @Service
 @RequiredArgsConstructor
 public class StudentService{
@@ -24,6 +26,11 @@ public class StudentService{
     private final StudentDAO studentDAO;
     private final StudentMapper studentMapper;
 
+    /**
+     * Finds all Students on database and get them as List<StudentDTO>
+     *
+     * @return List<StudentDTO>
+     */
     public List<StudentDTO> findAll() {
         List<StudentDTO> studentList = new ArrayList<>();
         Iterable<Student> studentIter = studentDAO.findAll();
@@ -35,10 +42,22 @@ public class StudentService{
         return studentList;
     }
 
+    /**
+     * Finds Studenta by ID on database and get them as StudentDTO
+     *
+     * @param id id of the Student.
+     * @return StudentDTO
+     */
     public StudentDTO findById(int id) {
         return studentMapper.mapFromStudenttoStudentDTO(studentDAO.findById(id).get());
     }
 
+    /**
+     * Saves Students to Database
+     *
+     * @param studentDTO
+     * @return Optional<StudentDTO>
+     */
     @Transactional
     public Optional<Student> save (StudentDTO studentDTO) {
         calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
@@ -48,6 +67,12 @@ public class StudentService{
         return Optional.of(studentDAO.save(student));
     }
 
+    /**
+     * Deletes Student from Database by ID
+     *
+     * @param id, Student ID
+     * @return StudentDTO
+     */
     public StudentDTO deleteById(int id) {
 //        studentDAO.deleteById(id);
         Student student = studentDAO.findById(id).get();
@@ -57,6 +82,13 @@ public class StudentService{
         return studentDTO;
     }
 
+    /**
+     * Updates a Student from Database by ID
+     *
+     * @param studentDTO
+     * @param id id of the Student.
+     * @return Optional<Student>
+     */
     @Transactional
     public Optional<Student> update(StudentDTO studentDTO, int id) {
 
@@ -67,6 +99,12 @@ public class StudentService{
         return Optional.of(studentDAO.save(student));
     }
 
+    /**
+     * Takes birthdate as parameter and calculates age for age exception
+     *
+     * @param birthDate Student's birthdate
+     * @return void
+     */
     public void calculateAgeFromBirthDate(Date birthDate) {
         SimpleDateFormat formatNowYear = new SimpleDateFormat("YYYY");
 

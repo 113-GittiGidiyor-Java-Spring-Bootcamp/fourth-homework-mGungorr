@@ -15,7 +15,9 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * This service has operations on api, you can do CRUD operations for Instructors and exceptions controls
+ */
 @Service
 @RequiredArgsConstructor
 public class InstructorService {
@@ -23,7 +25,11 @@ public class InstructorService {
     private final InstructorDAO instructorDAO;
     private final InstructorMapper instructorMapper;
 
-
+    /**
+     * Finds all Instructor on database and get them as List<InstructorDTO>
+     *
+     * @return List<InstructorDTO>
+     */
     public List<InstructorDTO> findAll() {
         List<InstructorDTO> instructorDTOList = new ArrayList<>();
         Iterable<Instructor> instructorIter = instructorDAO.findAll();
@@ -35,10 +41,22 @@ public class InstructorService {
         return instructorDTOList;
     }
 
+    /**
+     * Finds Instructors by ID on database and get them as InstructorDTO
+     *
+     * @param id id of the Instructor.
+     * @return InstructorDTO
+     */
     public InstructorDTO findById(int id) {
         return instructorMapper.mapFromInstructortoInstructorDTO(instructorDAO.findById(id).get());
     }
 
+    /**
+     * Saves Instructors to Database
+     *
+     * @param instructorDTO
+     * @return Optional<Instructor>
+     */
     @Transactional
     public Optional<Instructor> save(InstructorDTO instructorDTO) {
         InstructorExists(instructorDTO.getInstructorPhone());
@@ -47,6 +65,12 @@ public class InstructorService {
         return Optional.of(instructorDAO.save(instructor));
     }
 
+    /**
+     * Deletes Instructor from Database
+     *
+     * @param id, instructor ID
+     * @return InstructorDTO
+     */
     public InstructorDTO deleteById(int id) {
         Instructor instructor = instructorDAO.findById(id).get();
 
@@ -55,6 +79,13 @@ public class InstructorService {
         return instructorDTO;
     }
 
+    /**
+     * Updates an Instructor from Database by ID
+     *
+     * @param InstructorDTO
+     * @param id id of the Instructor.
+     * @return Optional<Instructor>
+     */
     @Transactional
     public Optional<Instructor> update(InstructorDTO instructorDTO, int id) {
         InstructorExists(instructorDTO.getInstructorPhone());
@@ -64,6 +95,12 @@ public class InstructorService {
         return Optional.of(instructorDAO.save(instructor));
     }
 
+    /**
+     * Checks Instructors if is there any duplicate Instructor data
+     *
+     * @param instructorPhone Instructor phone Number, Each phone number should be different
+     * @return void
+     */
     private void InstructorExists(long instructorPhone) {
 
         if (instructorDAO.findInstructorByInstructorPhone(instructorPhone).isPresent()) {
