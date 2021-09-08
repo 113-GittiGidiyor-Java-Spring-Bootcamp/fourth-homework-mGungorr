@@ -61,7 +61,8 @@ public class InstructorService {
     public Optional<Instructor> save(InstructorDTO instructorDTO) {
         InstructorExists(instructorDTO.getInstructorPhone());
         Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
-
+        instructor.setCreateTime(java.time.Clock.systemUTC().instant());
+        instructor.setModifiedTime(java.time.Clock.systemUTC().instant());
         return Optional.of(instructorDAO.save(instructor));
     }
 
@@ -82,7 +83,7 @@ public class InstructorService {
     /**
      * Updates an Instructor from Database by ID
      *
-     * @param InstructorDTO
+     * @param instructorDTO
      * @param id id of the Instructor.
      * @return Optional<Instructor>
      */
@@ -90,7 +91,7 @@ public class InstructorService {
     public Optional<Instructor> update(InstructorDTO instructorDTO, int id) {
         InstructorExists(instructorDTO.getInstructorPhone());
         Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
-
+        instructor.setModifiedTime(java.time.Clock.systemUTC().instant());
         instructor.setId(id);
         return Optional.of(instructorDAO.save(instructor));
     }

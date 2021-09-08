@@ -63,7 +63,8 @@ public class StudentService{
         calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
 
         Student student = studentMapper.mapFromStudentDTOtoStudent(studentDTO);
-
+        student.setCreateTime(java.time.Clock.systemUTC().instant());
+        student.setModifiedTime(java.time.Clock.systemUTC().instant());
         return Optional.of(studentDAO.save(student));
     }
 
@@ -94,6 +95,7 @@ public class StudentService{
 
         calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
         Student student = studentMapper.mapFromStudentDTOtoStudent(studentDTO);
+        student.setModifiedTime(java.time.Clock.systemUTC().instant());
 
         student.setId(id);
         return Optional.of(studentDAO.save(student));

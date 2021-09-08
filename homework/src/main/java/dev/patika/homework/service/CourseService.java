@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +62,8 @@ public class CourseService {
         CourseExists(courseDTO.getCourseCode());
         NumberOfStudentsInCourse(courseDTO.getId());
         Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
-
+        course.setCreateTime(java.time.Clock.systemUTC().instant());
+        course.setModifiedTime(java.time.Clock.systemUTC().instant());
         return Optional.of(courseDAO.save(course));
     }
 
@@ -92,7 +94,7 @@ public class CourseService {
         CourseExists(courseDTO.getCourseCode());
         NumberOfStudentsInCourse(id);
         Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
-
+        course.setModifiedTime(java.time.Clock.systemUTC().instant());
         course.setId(id);
         return Optional.of(courseDAO.save(course));
     }
