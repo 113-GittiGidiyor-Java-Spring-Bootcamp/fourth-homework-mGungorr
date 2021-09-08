@@ -4,8 +4,8 @@ import dev.patika.homework.dto.InstructorDTO;
 import dev.patika.homework.model.Instructor;
 import org.mapstruct.Mapper;
 
-@Mapper
-public interface InstructorMapper {
-    Instructor mapFromInstructorDTOtoInstructor(InstructorDTO dto);
-    InstructorDTO mapFromInstructortoInstructorDTO(Instructor instructor);
+@Mapper(componentModel = "spring")
+public abstract class InstructorMapper {
+    public abstract Instructor mapFromInstructorDTOtoInstructor(InstructorDTO dto);
+    public abstract InstructorDTO mapFromInstructortoInstructorDTO(Instructor instructor);
 }

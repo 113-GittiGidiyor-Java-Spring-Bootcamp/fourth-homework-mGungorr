@@ -23,8 +23,9 @@ public class Student extends AbstractBaseEntity{
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date studentBirthDate;
     private String studentAdress;
+
+    @Enumerated(EnumType.STRING)
     private Gender gender;
-    private int age;
 
     @ManyToMany(mappedBy = "student")
     @ToString.Exclude

@@ -14,5 +14,4 @@ public interface CourseDAO extends CrudRepository<Course,Integer> {
     @Query("select count(e) from Course e")
     int getNumberOfCourses();
 
-    List<Student> getAge();
 }

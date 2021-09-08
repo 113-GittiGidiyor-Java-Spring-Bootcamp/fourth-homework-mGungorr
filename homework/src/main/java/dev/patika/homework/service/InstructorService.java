@@ -1,51 +1,65 @@
 package dev.patika.homework.service;
 
+import dev.patika.homework.dto.InstructorDTO;
+import dev.patika.homework.dto.StudentDTO;
+import dev.patika.homework.mappers.InstructorMapper;
 import dev.patika.homework.model.Instructor;
+import dev.patika.homework.model.Student;
 import dev.patika.homework.repository.InstructorDAO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class InstructorService implements BaseService<Instructor> {
+@RequiredArgsConstructor
+public class InstructorService{
 
     private final InstructorDAO instructorDAO;
+    private final InstructorMapper instructorMapper;
 
-    public InstructorService(InstructorDAO instructorDAO) {
-        this.instructorDAO = instructorDAO;
-    }
 
-    @Override
-    public List<Instructor> findAll() {
-        List<Instructor> instructorList = new ArrayList<>();
+    public List<InstructorDTO> findAll() {
+        List<InstructorDTO> instructorDTOList = new ArrayList<>();
         Iterable<Instructor> instructorIter = instructorDAO.findAll();
         for (Instructor instructor : instructorIter) {
-            instructorList.add(instructor);
+            InstructorDTO instructorDTO = instructorMapper.mapFromInstructortoInstructorDTO(instructor);
+            instructorDTOList.add(instructorDTO);
         }
-        return instructorList;
+
+        return instructorDTOList;
     }
 
-    @Override
-    public Instructor findById(int id) {
-        return instructorDAO.findById(id).get();
+    public InstructorDTO findById(int id) {
+        return instructorMapper.mapFromInstructortoInstructorDTO(instructorDAO.findById(id).get());
     }
 
-    @Override
     @Transactional
-    public Instructor save(Instructor instructor) {
-        return instructorDAO.save(instructor);
+    public Optional<Instructor> save(InstructorDTO instructorDTO) {
+//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+
+        Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
+
+        return Optional.of(instructorDAO.save(instructor));
     }
 
-    @Override
-    public void deleteById(int id) {
+    public InstructorDTO deleteById(int id) {
+        Instructor instructor = instructorDAO.findById(id).get();
+
+        InstructorDTO instructorDTO = instructorMapper.mapFromInstructortoInstructorDTO(instructor);
         instructorDAO.deleteById(id);
+        return instructorDTO;
     }
 
-    @Override
     @Transactional
-    public Instructor update(Instructor instructor) {
-        return instructorDAO.save(instructor);
+    public Optional<Instructor> update(InstructorDTO instructorDTO, int id) {
+//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+        Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
+
+        instructor.setId(id);
+        return Optional.of(instructorDAO.save(instructor));
     }
 }
