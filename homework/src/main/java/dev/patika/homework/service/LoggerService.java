@@ -1,9 +1,7 @@
 package dev.patika.homework.service;
 
-import dev.patika.homework.dto.CourseDTO;
 import dev.patika.homework.dto.LoggerDTO;
 import dev.patika.homework.mappers.LoggerMapper;
-import dev.patika.homework.model.Course;
 import dev.patika.homework.model.Logger;
 import dev.patika.homework.repository.LoggerDAO;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+/**
+ * This service has operations on api, you can do CRUD operations for Logs
+ */
 @Service
 @RequiredArgsConstructor
 public class LoggerService {
@@ -22,6 +20,14 @@ public class LoggerService {
     private final LoggerDAO loggerDAO;
     private final LoggerMapper loggerMapper;
 
+    /**
+     * Logger Service for logging exceptions
+     *
+     * @param msg Error message
+     * @param type Status Code of errors
+     * @param date Date of Error
+     * @return List<LoggerDTO>
+     */
     public List<LoggerDTO> findByMessageOrTypeOrDate(String msg, String type, String date) {
 
         if (date == null) {
