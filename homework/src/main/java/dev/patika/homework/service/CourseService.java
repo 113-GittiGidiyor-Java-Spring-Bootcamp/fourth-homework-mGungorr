@@ -2,6 +2,8 @@ package dev.patika.homework.service;
 
 import dev.patika.homework.dto.CourseDTO;
 import dev.patika.homework.dto.StudentDTO;
+import dev.patika.homework.exceptions.CourseIsAlreadyExistException;
+import dev.patika.homework.exceptions.StudentNumberForOneCourseExceededException;
 import dev.patika.homework.mappers.CourseMapper;
 import dev.patika.homework.model.Course;
 import dev.patika.homework.model.Student;
@@ -10,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +41,8 @@ public class CourseService{
 
     @Transactional
     public Optional<Course> save(CourseDTO courseDTO) {
-//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
-
+        CourseExists(courseDTO.getCourseCode());
+        NumberOfStudentsInCourse(courseDTO.getId());
         Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
 
         return Optional.of(courseDAO.save(course));
@@ -58,12 +59,25 @@ public class CourseService{
 
     @Transactional
     public Optional<Course> update(CourseDTO courseDTO, int id) {
-
-//        calculateAgeFromBirthDate(courseDTO.getStudentBirthDate());
+        CourseExists(courseDTO.getCourseCode());
+        NumberOfStudentsInCourse(id);
         Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
 
         course.setId(id);
         return Optional.of(courseDAO.save(course));
+    }
+
+    private void CourseExists(int courseCode) {
+
+        if (courseDAO.findCourseByCourseCode(courseCode).isPresent()) {
+            throw new CourseIsAlreadyExistException("Course Is Already Exist!");
+        }
+    }
+
+    private void NumberOfStudentsInCourse(int numberOfStudents) {
+        if (numberOfStudents > 20) {
+            throw new StudentNumberForOneCourseExceededException("This course is limited to 20 people!");
+        }
     }
 
 }

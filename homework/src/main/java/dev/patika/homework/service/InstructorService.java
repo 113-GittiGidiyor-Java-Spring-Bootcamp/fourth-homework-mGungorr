@@ -2,6 +2,8 @@ package dev.patika.homework.service;
 
 import dev.patika.homework.dto.InstructorDTO;
 import dev.patika.homework.dto.StudentDTO;
+import dev.patika.homework.exceptions.CourseIsAlreadyExistException;
+import dev.patika.homework.exceptions.InstructorIsAlreadyExistException;
 import dev.patika.homework.mappers.InstructorMapper;
 import dev.patika.homework.model.Instructor;
 import dev.patika.homework.model.Student;
@@ -16,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class InstructorService{
+public class InstructorService {
 
     private final InstructorDAO instructorDAO;
     private final InstructorMapper instructorMapper;
@@ -39,8 +41,7 @@ public class InstructorService{
 
     @Transactional
     public Optional<Instructor> save(InstructorDTO instructorDTO) {
-//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
-
+        InstructorExists(instructorDTO.getInstructorPhone());
         Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
 
         return Optional.of(instructorDAO.save(instructor));
@@ -56,10 +57,17 @@ public class InstructorService{
 
     @Transactional
     public Optional<Instructor> update(InstructorDTO instructorDTO, int id) {
-//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+        InstructorExists(instructorDTO.getInstructorPhone());
         Instructor instructor = instructorMapper.mapFromInstructorDTOtoInstructor(instructorDTO);
 
         instructor.setId(id);
         return Optional.of(instructorDAO.save(instructor));
+    }
+
+    private void InstructorExists(long instructorPhone) {
+
+        if (instructorDAO.findInstructorByInstructorPhone(instructorPhone).isPresent()) {
+            throw new InstructorIsAlreadyExistException("Instructor Is Already Exist With Same Phone Number!");
+        }
     }
 }
