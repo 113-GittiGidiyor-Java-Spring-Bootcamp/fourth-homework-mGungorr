@@ -1,7 +1,12 @@
 package dev.patika.homework.service;
 
+import dev.patika.homework.dto.StudentDTO;
+import dev.patika.homework.exceptions.StudentAgeNotValidException;
+import dev.patika.homework.mappers.StudentMapper;
 import dev.patika.homework.model.Student;
 import dev.patika.homework.repository.StudentDAO;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,55 +15,66 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class StudentService implements BaseService<Student> {
+@RequiredArgsConstructor
+public class StudentService{
 
     private final StudentDAO studentDAO;
+    private final StudentMapper studentMapper;
 
-    public StudentService(StudentDAO studentDAO) {
-        this.studentDAO = studentDAO;
-    }
-
-    @Override
-    public List<Student> findAll() {
-        List<Student> studentList = new ArrayList<>();
+    public List<StudentDTO> findAll() {
+        List<StudentDTO> studentList = new ArrayList<>();
         Iterable<Student> studentIter = studentDAO.findAll();
         for (Student student : studentIter) {
-            studentList.add(student);
+            StudentDTO studentDTO = studentMapper.mapFromStudenttoStudentDTO(student);
+            studentList.add(studentDTO);
         }
+
         return studentList;
     }
 
-    @Override
-    public Student findById(int id) {
-        return studentDAO.findById(id).get();
+    public StudentDTO findById(int id) {
+        return studentMapper.mapFromStudenttoStudentDTO(studentDAO.findById(id).get());
     }
 
-    @Override
     @Transactional
-    public Student save(Student student) {
-        return studentDAO.save(student);
+    public Optional<Student> save (StudentDTO studentDTO) {
+        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+
+        Student student = studentMapper.mapFromStudentDTOtoStudent(studentDTO);
+
+        return Optional.of(studentDAO.save(student));
     }
 
-    @Override
-    public void deleteById(int id) {
+    public StudentDTO deleteById(int id) {
+//        studentDAO.deleteById(id);
+        Student student = studentDAO.findById(id).get();
+
+        StudentDTO studentDTO = studentMapper.mapFromStudenttoStudentDTO(student);
         studentDAO.deleteById(id);
+        return studentDTO;
     }
 
-    @Override
     @Transactional
-    public Student update(Student student) {
-        return studentDAO.save(student);
+    public Optional<Student> update(StudentDTO studentDTO, int id) {
+
+        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+        Student student = studentMapper.mapFromStudentDTOtoStudent(studentDTO);
+
+        student.setId(id);
+        return Optional.of(studentDAO.save(student));
     }
 
-    public int calculateAgeFromBirthDate(Date birthDate){
+    public void calculateAgeFromBirthDate(Date birthDate) {
         SimpleDateFormat formatNowYear = new SimpleDateFormat("YYYY");
 
         String birthYear = formatNowYear.format(birthDate);
-        LocalDate localDate = LocalDate.now();
-        int year = localDate.getYear();
-        return year - Integer.parseInt(birthYear);
-
+        int currentYear = LocalDate.now().getYear();
+        int age = currentYear - Integer.parseInt(birthYear);
+        if (age < 18 || age > 40) {
+            throw new StudentAgeNotValidException("Student age is not between 18 and 40!!!");
+        }
     }
 }

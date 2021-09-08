@@ -1,64 +1,69 @@
 package dev.patika.homework.service;
 
+import dev.patika.homework.dto.CourseDTO;
+import dev.patika.homework.dto.StudentDTO;
+import dev.patika.homework.mappers.CourseMapper;
 import dev.patika.homework.model.Course;
 import dev.patika.homework.model.Student;
 import dev.patika.homework.repository.CourseDAO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class CourseService implements BaseService<Course> {
+@RequiredArgsConstructor
+public class CourseService{
 
     private final CourseDAO courseDAO;
+    private final CourseMapper courseMapper;
 
-    public CourseService(CourseDAO courseDAO) {
-        this.courseDAO = courseDAO;
-    }
-
-    @Override
     @Transactional
-    public List<Course> findAll() {
-        List<Course> courseList = new ArrayList<>();
+    public List<CourseDTO> findAll() {
+        List<CourseDTO> courseList = new ArrayList<>();
         Iterable<Course> courseIter = courseDAO.findAll();
         for (Course course : courseIter) {
-            courseList.add(course);
+            CourseDTO courseDTO = courseMapper.mapFromCoursetoCourseDTO(course);
+            courseList.add(courseDTO);
         }
         return courseList;
     }
 
-    @Override
     @Transactional
-    public Course findById(int id) {
-        return courseDAO.findById(id).get();
+    public CourseDTO findById(int id) {
+        return courseMapper.mapFromCoursetoCourseDTO(courseDAO.findById(id).get());
     }
 
-    @Override
     @Transactional
-    public Course save(Course course) {
-        return courseDAO.save(course);
+    public Optional<Course> save(CourseDTO courseDTO) {
+//        calculateAgeFromBirthDate(studentDTO.getStudentBirthDate());
+
+        Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
+
+        return Optional.of(courseDAO.save(course));
     }
 
-    @Override
-    public void deleteById(int id) {
+    public CourseDTO deleteById(int id) {
+//        studentDAO.deleteById(id);
+        Course course = courseDAO.findById(id).get();
+
+        CourseDTO courseDTO = courseMapper.mapFromCoursetoCourseDTO(course);
         courseDAO.deleteById(id);
+        return courseDTO;
     }
 
-    @Override
     @Transactional
-    public Course update(Course course) {
-        return courseDAO.save(course);
+    public Optional<Course> update(CourseDTO courseDTO, int id) {
+
+//        calculateAgeFromBirthDate(courseDTO.getStudentBirthDate());
+        Course course = courseMapper.mapFromCourseDTOtoCourse(courseDTO);
+
+        course.setId(id);
+        return Optional.of(courseDAO.save(course));
     }
 
-    public int getNumberOfCourses() {
-        return courseDAO.getNumberOfCourses();
-    }
-
-
-    public List<Student> findByAgeGreaterThanAndAgeBefore(int studentID, LocalDate birthDate) {
-        return courseDAO.getAge();
-    }
 }

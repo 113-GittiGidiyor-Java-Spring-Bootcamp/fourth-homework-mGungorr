@@ -4,8 +4,8 @@ import dev.patika.homework.dto.CourseDTO;
 import dev.patika.homework.model.Course;
 import org.mapstruct.Mapper;
 
-@Mapper
-public interface CourseMapper {
-    Course mapFromCourseDTOtoCourse(CourseDTO dto);
-    CourseDTO mapFromCoursetoCourseDTO(Course course);
+@Mapper(componentModel = "spring")
+public abstract class CourseMapper {
+    public abstract Course mapFromCourseDTOtoCourse(CourseDTO dto);
+    public abstract CourseDTO mapFromCoursetoCourseDTO(Course course);
 }

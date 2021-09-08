@@ -1,12 +1,15 @@
 package dev.patika.homework.controller;
 
+import dev.patika.homework.dto.StudentDTO;
 import dev.patika.homework.model.Student;
 import dev.patika.homework.service.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -18,23 +21,27 @@ public class StudentController {
     }
 
     @GetMapping("/students")
-    public ResponseEntity<List<Student>> findAll() {
+    public ResponseEntity<List<StudentDTO>> findAll() {
         return new ResponseEntity<>(studentService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping("/students")
-    public Student saveStudent(@RequestBody Student student) {
-        return studentService.save(student);
+    public ResponseEntity<Student> saveStudent(@RequestBody StudentDTO studentDTO) {
+        Optional<Student> resultOptional = studentService.save(studentDTO);
+        if (resultOptional.isPresent()){
+            return new ResponseEntity<>(resultOptional.get(),HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/students/{id}")
-    public ResponseEntity<Student> findStudentById(@PathVariable int id){
+    public ResponseEntity<StudentDTO> findStudentById(@PathVariable int id){
         return new ResponseEntity<>(studentService.findById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/students")
-    public Student updateStudent(@RequestBody Student student){
-        return studentService.update(student);
+    @PutMapping("/students/{id}")
+    public ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody StudentDTO studentDTO) {
+        return new ResponseEntity<>(studentService.update(studentDTO, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/students/{id}")
@@ -42,8 +49,4 @@ public class StudentController {
         studentService.deleteById(id);
         return "Deleted...";
     }
-
-
-
-
 }
